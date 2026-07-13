@@ -502,6 +502,55 @@ tr.row-warning { background: var(--warn-bg); }
 .doc-item label { font-size: 14px; }
 .doc-item .doc-sub { display: block; font-size: 12px; color: var(--text-sub); margin-top: 2px; }
 
+/* 記事ページの「トップページへ戻る」導線（目立たせる） */
+.back-to-top-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card-bg);
+  border: 2px solid var(--grain-main);
+  color: var(--grain-dark);
+  font-weight: 700;
+  font-size: 14.5px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-card);
+  transition: transform .15s ease, background .15s ease, color .15s ease;
+}
+.back-to-top-link:hover {
+  background: var(--grain-main);
+  color: #fff;
+  transform: translateY(-2px);
+}
+.back-to-top-row-top { margin-bottom: 22px; }
+.back-to-top-row-bottom { margin-top: 30px; }
+footer.site-footer .back-to-top-link { margin-top: 6px; }
+
+/* 免責バナー（index.html上部・目立つ表示） */
+.disclaimer-banner {
+  position: relative;
+  z-index: 2;
+  max-width: 880px;
+  margin: 22px auto 0;
+  padding: 0 20px;
+}
+.disclaimer-banner .inner {
+  background: var(--warn-bg);
+  border: 2px solid var(--warn);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  font-size: 13.5px;
+  color: var(--text-main);
+  line-height: 1.8;
+}
+.disclaimer-banner .inner strong {
+  color: var(--warn);
+}
+.disclaimer-banner ul {
+  margin: 8px 0 0 20px;
+  padding: 0;
+}
+
 /* 準備中バッジ */
 .coming-soon {
   text-align: center;
