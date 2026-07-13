@@ -294,18 +294,18 @@ function initWizard() {
     }
 
     if (state.step === 1) {
-      root.appendChild(buildChoiceStep({
-        progress: '質問 1 / 6',
-        question: '現在の処遇改善加算の算定状況は？',
-        choices: [
-          { label: '算定していない（新規に算定したい）', value: 'new' },
-          { label: '処遇改善加算ⅢまたはⅣを算定している', value: 'iii_iv' },
-          { label: '処遇改善加算ⅠまたはⅡを算定している', value: 'i_ii' }
-        ],
-        onSelect: function () { state.step = 2; render(); }
-      }));
-      return;
-    }
+  root.appendChild(buildChoiceStep({
+    progress: '質問 1 / 7',
+    question: '現在の処遇改善加算の算定状況は？',
+    choices: [
+      { label: '算定していない（新規に算定したい）', value: 'new' },
+      { label: '処遇改善加算ⅢまたはⅣを算定している', value: 'iii_iv' },
+      { label: '処遇改善加算ⅠまたはⅡを算定している', value: 'i_ii' }
+    ],
+    onSelect: function (v) { state.currentGrade = v; state.step = 2; render(); }
+  }));
+  return;
+}
 
     if (state.step === 2) {
       root.appendChild(buildCareerPathStep(1, 'キャリアパス要件Ⅰ（任用要件・賃金体系の整備等）',
@@ -330,7 +330,7 @@ function initWizard() {
 
     if (state.step === 5) {
       root.appendChild(buildChoiceStep({
-        progress: '質問 5 / 6',
+        progress: '質問 5 / ',
         question: 'キャリアパス要件Ⅳ（改善後の賃金要件）は満たせそうですか？',
         note: '事業所内に、改善後の賃金が年額440万円以上となる職員が1人以上いる状態を指します。この要件には「誓約」による猶予の仕組みがありません。',
         choices: [
@@ -344,7 +344,7 @@ function initWizard() {
 
     if (state.step === 6) {
       root.appendChild(buildChoiceStep({
-        progress: '質問 6 / 6',
+        progress: '質問 6 / 7',
         question: 'キャリアパス要件Ⅴ（配置等要件）はいかがですか？',
         note: 'サービス種別によって内容が異なる、やや個別性の高い要件です。判断が難しい場合は「わからない・該当なし」を選んでください（結果画面で確認方法をご案内します）。',
         choices: [
@@ -425,7 +425,7 @@ function initWizard() {
 
   function buildCareerPathStep(no, title, note, onSelect) {
     return buildChoiceStep({
-      progress: '質問 ' + (no + 1) + ' / 6',
+      progress: '質問 ' + (no + 1) + ' / ',
       question: title + ' の整備状況は？',
       note: note,
       choices: [
@@ -501,6 +501,7 @@ function initWizard() {
     noteP.style.marginTop = '14px';
     noteP.innerHTML =
       'この結果は、令和7年3月7日付 障障発0307第１号通知の要件構造に基づく目安です。' +
+      'なお、どの区分を目指す場合でも、月額賃金改善要件Ⅰ・Ⅱ（加算額に応じた基本給等の引上げ）は別途必ず実施する必要があります。' +
       '誓約に関する取扱いや配置等要件の詳細は、事業所の状況によって異なる場合がありますので、' +
       '最終的な区分の決定・届出前に必ず指定権者（自治体）または国民健康保険団体連合会にご確認ください。';
     box.appendChild(noteP);
