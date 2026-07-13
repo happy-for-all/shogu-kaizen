@@ -1,0 +1,33 @@
+name: Deploy to Cloudflare Workers
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare dist folder
+        run: |
+          mkdir -p dist
+          cp index.html dist/
+          cp style.css dist/
+          cp script.js dist/
+          cp column-01.html dist/
+          cp column-02.html dist/
+          # ▼ 新しいファイル(記事・favicon.ico・ads.txt等)を追加したら、
+          #    ここに1行を必ず追加すること（反映漏れ防止・つまづきメモ参照）
+          # cp favicon.ico dist/
+          # cp ads.txt dist/
+          # cp column-03.html dist/
+          # cp column-04.html dist/
+          # cp column-05.html dist/
+
+      - name: Deploy with Wrangler
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          command: deploy --config wrangler.json
