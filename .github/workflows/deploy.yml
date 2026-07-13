@@ -21,6 +21,7 @@ jobs:
           cp column-03.html dist/
           cp column-04.html dist/
           cp column-05.html dist/
+          cp column-06.html dist/
           # ▼ 新しいファイル(favicon.ico・ads.txt等)を追加したら、
           #    ここに1行を必ず追加すること（反映漏れ防止・つまづきメモ参照）
           # cp favicon.ico dist/
