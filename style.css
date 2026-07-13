@@ -1,0 +1,676 @@
+/* =========================================
+   処遇改善加算ナビ｜style.css
+   ベース：相談支援ノートのCSS構造を継承
+   変更点：クローバー畑（緑）→ 稲穂畑（琥珀・黄金）テーマ
+   「処遇改善（加算）＝実りを収穫する」イメージ
+   ========================================= */
+
+/* -----------------------------------------
+   1. デザイントークン
+   ----------------------------------------- */
+:root {
+  /* 空・太陽（実りの季節＝秋の夕方寄りの空に） */
+  --sky-top:      #4A82B4;
+  --sky-mid:      #BFD8E8;
+  --sky-low:      #FDF2DC;
+  --sun-core:     #FFE9A8;
+  --sun-mid:      #FFC15E;
+  --sun-edge:     #FF9D3D;
+
+  /* 土手・大地 */
+  --earth-top:    #B08850;
+  --earth-bottom: #7A5A32;
+
+  /* 稲穂（クローバーの代わり） */
+  --grain-main:   #D9A441;
+  --grain-dark:   #A9762A;
+  --grain-light:  #F0C97A;
+
+  /* テキスト・UI */
+  --text-main:    #3B2F1E;
+  --text-sub:     #6B5A42;
+  --card-bg:      rgba(255, 253, 247, 0.94);
+  --card-bg-soft: rgba(255, 253, 247, 0.86);
+  --card-border:  rgba(169, 118, 42, 0.28);
+  --accent:       #E8834A;
+  --accent-dark:  #C96A36;
+  --danger:       #C24B3F;
+  --danger-bg:    #FBE8E5;
+  --warn:         #D68A2E;
+  --warn-bg:      #FDF1DE;
+  --radius-lg:    22px;
+  --radius-md:    14px;
+  --shadow-card:  0 14px 36px rgba(90, 66, 30, 0.16);
+  --section-gap:  72px;
+}
+
+/* -----------------------------------------
+   2. リセット & ベース
+   ----------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: "Noto Sans JP", "Hiragino Sans", Meiryo, sans-serif;
+  color: var(--text-main);
+  line-height: 1.85;
+  font-size: 16px;
+  background: var(--sky-low);
+  overflow-x: hidden;
+}
+
+h1, h2, h3, .brand {
+  font-family: "Zen Maru Gothic", "Noto Sans JP", sans-serif;
+}
+
+a { color: inherit; text-decoration: none; }
+img, svg { max-width: 100%; display: block; }
+button { font-family: inherit; cursor: pointer; }
+input, select { font-family: inherit; }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* -----------------------------------------
+   3. 背景シーン（固定・パララックス）
+   script.jsが .parallax-sky / .parallax-ground に
+   スクロール量に応じたtransformを与え、奥行きを出す。
+   ----------------------------------------- */
+#bg-scene {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    var(--sky-top) 0%,
+    var(--sky-mid) 55%,
+    var(--sky-low) 100%
+  );
+}
+
+.parallax-sky,
+.parallax-ground {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+/* 太陽 */
+.sun-glow {
+  position: absolute;
+  top: 6%;
+  right: 8%;
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 38%, var(--sun-core) 0%, var(--sun-mid) 55%, var(--sun-edge) 100%);
+  box-shadow: 0 0 90px 30px rgba(255, 193, 94, 0.45);
+  animation: sunPulse 6s ease-in-out infinite;
+}
+@keyframes sunPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 90px 30px rgba(255, 193, 94, 0.45); }
+  50%      { transform: scale(1.045); box-shadow: 0 0 110px 40px rgba(255, 193, 94, 0.55); }
+}
+
+/* 雲 */
+.cloud {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 60px;
+  filter: blur(1px);
+}
+.cloud::before, .cloud::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+}
+.cloud-a { width: 170px; height: 46px; top: 14%; left: 8%;  animation: drift 46s linear infinite; }
+.cloud-a::before { width: 78px; height: 68px; top: -32px; left: 24px; }
+.cloud-a::after  { width: 58px; height: 50px; top: -22px; left: 82px; }
+
+.cloud-b { width: 130px; height: 36px; top: 24%; left: 42%; opacity: .9; animation: drift 60s linear infinite reverse; }
+.cloud-b::before { width: 60px; height: 52px; top: -24px; left: 18px; }
+.cloud-b::after  { width: 44px; height: 38px; top: -16px; left: 68px; }
+
+.cloud-c { width: 110px; height: 30px; top: 9%; left: 62%; opacity: .85; animation: drift 52s linear infinite; }
+.cloud-c::before { width: 50px; height: 42px; top: -20px; left: 14px; }
+.cloud-c::after  { width: 36px; height: 30px; top: -13px; left: 56px; }
+
+.cloud-d { width: 90px; height: 26px; top: 40%; left: 22%; opacity: .7; animation: drift 68s linear infinite reverse; }
+.cloud-d::before { width: 42px; height: 36px; top: -18px; left: 10px; }
+.cloud-d::after  { width: 30px; height: 26px; top: -11px; left: 46px; }
+
+@keyframes drift {
+  from { transform: translateX(-40px); }
+  to   { transform: translateX(calc(100vw + 40px)); }
+}
+
+/* 土手・大地（常に画面下端に固定） */
+.ground {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 230px;
+  background: linear-gradient(to bottom, var(--earth-top) 0%, var(--earth-bottom) 100%);
+  border-radius: 45% 45% 0 0 / 60px 60px 0 0;
+}
+.ground::before {
+  content: '';
+  position: absolute;
+  top: -14px; left: 0; right: 0;
+  height: 30px;
+  background: var(--grain-main);
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+
+/* 稲穂（クローバーの代わり） */
+.grain-row {
+  position: absolute;
+  bottom: 128px;
+  left: 0; right: 0;
+  height: 100px;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+}
+.grain {
+  position: relative;
+  width: 14px;
+  height: 60px;
+  transform-origin: bottom center;
+  animation: sway 4.5s ease-in-out infinite;
+}
+/* 茎 */
+.grain::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  width: 3px; height: 100%;
+  background: var(--grain-dark);
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+/* 穂（粒を積み重ねて表現） */
+.grain::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  width: 16px; height: 34px;
+  background:
+    radial-gradient(circle at 50% 10%, var(--grain-light) 0 5px, transparent 6px),
+    radial-gradient(circle at 20% 30%, var(--grain-light) 0 4px, transparent 5px),
+    radial-gradient(circle at 80% 30%, var(--grain-main) 0 4px, transparent 5px),
+    radial-gradient(circle at 30% 55%, var(--grain-main) 0 4px, transparent 5px),
+    radial-gradient(circle at 70% 55%, var(--grain-light) 0 4px, transparent 5px),
+    radial-gradient(circle at 50% 78%, var(--grain-dark) 0 4px, transparent 5px);
+  transform: translateX(-50%);
+}
+.grain:nth-child(2n)   { animation-delay: .6s;  height: 46px; }
+.grain:nth-child(3n)   { animation-delay: 1.2s; height: 68px; }
+.grain:nth-child(4n+1) { animation-delay: 1.8s; }
+.grain:nth-child(5n+2) { animation-delay: 2.4s; height: 40px; }
+@keyframes sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50%      { transform: rotate(3deg); }
+}
+
+/* 動きを抑えたい人向け（アクセシビリティ） */
+@media (prefers-reduced-motion: reduce) {
+  .sun-glow, .cloud, .grain { animation: none !important; }
+  .parallax-sky, .parallax-ground { transform: none !important; }
+}
+
+/* -----------------------------------------
+   4. レイアウト共通
+   ----------------------------------------- */
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+}
+
+header.site-header {
+  position: relative;
+  z-index: 2;
+  padding: 26px 20px 0;
+  max-width: 880px;
+  margin: 0 auto;
+}
+.brand {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.18);
+}
+.brand span {
+  display: block;
+  font-family: "Noto Sans JP", sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  opacity: .92;
+  margin-top: 2px;
+}
+
+/* -----------------------------------------
+   5. ツールカード（最上部・常時利用エリア）
+   ----------------------------------------- */
+.tool-card {
+  position: relative;
+  z-index: 2;
+  margin-top: 40px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 30px 26px 26px;
+}
+.tool-card h1 {
+  font-size: 24px;
+  line-height: 1.5;
+  color: var(--grain-dark);
+  margin-bottom: 6px;
+}
+.tool-card .lede {
+  color: var(--text-sub);
+  font-size: 14.5px;
+  margin-bottom: 22px;
+}
+
+/* タブ切り替え（診断／チェックリスト／用語辞典） */
+.tab-nav {
+  display: flex;
+  gap: 6px;
+  border-bottom: 2px solid var(--card-border);
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  background: transparent;
+  border: none;
+  padding: 10px 16px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--text-sub);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+}
+.tab-btn.is-active {
+  color: var(--grain-dark);
+  border-bottom-color: var(--grain-main);
+}
+.tab-panel { display: none; }
+.tab-panel.is-active { display: block; }
+
+.tool-form {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  align-items: end;
+}
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 12.5px; color: var(--text-sub); font-weight: 700; }
+.field input, .field select {
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  font-size: 14.5px;
+  background: #fff;
+  color: var(--text-main);
+}
+.field input:focus, .field select:focus,
+button:focus-visible {
+  outline: 3px solid var(--grain-light);
+  outline-offset: 1px;
+}
+
+.btn {
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 11px 18px;
+  font-size: 14.5px;
+  font-weight: 700;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-dark); }
+.btn-ghost {
+  background: transparent;
+  color: var(--grain-dark);
+  border: 1px solid var(--card-border);
+}
+.btn-ghost:hover { background: rgba(169,118,42,0.1); }
+.btn-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+
+.disclaimer-note {
+  margin-top: 16px;
+  font-size: 12.5px;
+  color: var(--text-sub);
+  background: rgba(169,118,42,0.08);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+}
+
+/* 診断ウィザード専用 */
+.wizard-step { display: none; }
+.wizard-step.is-active { display: block; }
+.wizard-progress {
+  font-size: 12.5px;
+  color: var(--text-sub);
+  margin-bottom: 14px;
+  font-weight: 700;
+}
+.choice-list { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.choice-btn {
+  text-align: left;
+  background: #fff;
+  border: 1.5px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  font-size: 14.5px;
+  color: var(--text-main);
+  transition: border-color .15s ease, background .15s ease;
+}
+.choice-btn:hover { border-color: var(--grain-main); background: rgba(169,118,42,0.06); }
+.choice-btn .sub { display: block; font-size: 12.5px; color: var(--text-sub); margin-top: 3px; font-weight: 400; }
+
+.wizard-result {
+  background: rgba(169,118,42,0.08);
+  border: 1.5px solid var(--grain-main);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  margin-top: 6px;
+}
+.wizard-result .result-grade {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--grain-dark);
+}
+.wizard-result .result-reason { font-size: 14px; color: var(--text-main); margin-top: 8px; }
+.reason-list { margin: 10px 0 0 0; padding-left: 20px; }
+.reason-list li { font-size: 13.5px; margin-bottom: 4px; }
+
+/* 一覧テーブル */
+.entry-table-wrap { margin-top: 22px; overflow-x: auto; }
+table.entries {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+table.entries th, table.entries td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(169,118,42,0.2);
+  white-space: nowrap;
+}
+table.entries th { color: var(--text-sub); font-weight: 700; font-size: 12.5px; }
+tr.row-urgent  { background: var(--danger-bg); }
+tr.row-warning { background: var(--warn-bg); }
+.tag {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.tag-urgent  { background: var(--danger); color: #fff; }
+.tag-warning { background: var(--warn); color: #fff; }
+.tag-ok      { background: var(--grain-main); color: #fff; }
+.delete-btn {
+  background: none; border: none;
+  color: var(--text-sub);
+  font-size: 13px;
+  text-decoration: underline;
+}
+.empty-state {
+  margin-top: 18px;
+  font-size: 13.5px;
+  color: var(--text-sub);
+  text-align: center;
+  padding: 18px;
+  border: 1px dashed var(--card-border);
+  border-radius: var(--radius-md);
+}
+
+/* 準備中バッジ */
+.coming-soon {
+  text-align: center;
+  padding: 30px 16px;
+  color: var(--text-sub);
+  font-size: 14px;
+  border: 1px dashed var(--card-border);
+  border-radius: var(--radius-md);
+}
+
+/* -----------------------------------------
+   6. 記事エリア（ガラス風パネルの連なり）
+   ----------------------------------------- */
+.article-flow {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+  margin-top: var(--section-gap);
+}
+
+.glass-section {
+  background: var(--card-bg-soft);
+  backdrop-filter: blur(2px);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 30px 30px 34px;
+}
+
+.glass-section h2 {
+  font-size: 20px;
+  color: var(--grain-dark);
+  border-left: 6px solid var(--grain-main);
+  padding-left: 12px;
+  margin-bottom: 14px;
+}
+.glass-section h3 {
+  font-size: 16px;
+  color: var(--text-main);
+  margin: 18px 0 8px;
+}
+.glass-section p, .glass-section li { color: var(--text-main); font-size: 15px; }
+.glass-section ul, .glass-section ol { padding-left: 22px; margin-bottom: 10px; }
+.glass-section .section-note {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--text-sub);
+  background: rgba(169,118,42,0.08);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+}
+
+/* 記事一覧カード（トップページからの導線） */
+.article-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.article-card {
+  display: block;
+  background: #fff;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  font-size: 14px;
+  color: var(--text-main);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.article-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-card); }
+.article-card .cat { font-size: 11.5px; color: var(--grain-dark); font-weight: 700; }
+
+.step-list { list-style: none; padding-left: 0; counter-reset: step; }
+.step-list li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 40px;
+  margin-bottom: 14px;
+}
+.step-list li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0; top: 0;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--grain-main);
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* アコーディオン（FAQ・用語集共通） */
+.accordion-group { display: flex; flex-direction: column; }
+.faq-item {
+  border-bottom: 1px solid rgba(169,118,42,0.2);
+  padding: 14px 0;
+}
+.faq-item:last-child { border-bottom: none; }
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--text-main);
+  list-style: none;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::before {
+  content: "Q";
+  flex-shrink: 0;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--grain-dark);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px;
+}
+.faq-item p {
+  margin-top: 10px;
+  padding-left: 30px;
+  color: var(--text-sub);
+  position: relative;
+}
+.faq-item p::before {
+  content: "A";
+  position: absolute;
+  left: 0; top: 1px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* 用語集アコーディオン（QAより簡素な見た目） */
+.glossary-item {
+  border-bottom: 1px solid rgba(169,118,42,0.2);
+  padding: 12px 0;
+}
+.glossary-item:last-child { border-bottom: none; }
+.glossary-item summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--grain-dark);
+  list-style: none;
+}
+.glossary-item summary::-webkit-details-marker { display: none; }
+.glossary-item summary::before { content: "🌾 "; }
+.glossary-item p { margin-top: 8px; color: var(--text-sub); padding-left: 22px; }
+
+footer.site-footer {
+  position: relative; z-index: 1;
+  max-width: 880px;
+  margin: 30px auto 0;
+  padding: 0 20px;
+  font-size: 12.5px;
+  color: var(--text-sub);
+  text-align: center;
+}
+footer.site-footer a { text-decoration: underline; }
+
+/* -----------------------------------------
+   7. レスポンシブ
+   ----------------------------------------- */
+@media (max-width: 720px) {
+  .tool-form { grid-template-columns: 1fr 1fr; }
+  .tool-card { padding: 24px 18px 20px; }
+  .glass-section { padding: 24px 18px 28px; }
+  .sun-glow { width: 120px; height: 120px; top: 5%; right: 6%; }
+  .article-card-grid { grid-template-columns: 1fr; }
+  :root { --section-gap: 48px; }
+}
+@media (max-width: 420px) {
+  .tool-form { grid-template-columns: 1fr; }
+}
+/* -----------------------------------------
+   8. トップに戻るボタン
+   ----------------------------------------- */
+#page-top {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 52px;
+  height: 52px;
+  background: var(--card-bg);
+  border: 2.5px solid var(--grain-main);
+  border-radius: 50%;
+  color: var(--grain-dark);
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 9000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px);
+  transition: all 0.35s ease;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 4px 16px rgba(122, 90, 50, 0.22),
+              0 0 0 4px rgba(169, 118, 42, 0.10);
+  line-height: 1;
+}
+#page-top.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+#page-top:hover {
+  background: var(--grain-main);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(122, 90, 50, 0.38),
+              0 0 0 6px rgba(169, 118, 42, 0.18);
+  transform: translateY(-3px);
+}
+
+/* -----------------------------------------
+   9. 印刷用スタイル
+   ----------------------------------------- */
+@media print {
+  #bg-scene, header.site-header, .article-flow, footer.site-footer,
+  .btn-row, .disclaimer-note, form.tool-form, #page-top, .tab-nav { display: none !important; }
+  body { background: #fff; }
+  .tool-card { box-shadow: none; border: none; }
+  .print-only { display: block !important; }
+  table.entries { font-size: 12px; }
+}
+.print-only { display: none; }

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>処遇改善加算ナビ｜うちの場合どうすればいいか、すぐ分かる</title>
+<meta name="description" content="障害福祉サービスの処遇改善加算(Ⅰ〜Ⅳ)、うちの事業所はどの区分を目指せばいいか、質問に答えるだけで診断できる無料ツールです。">
+
+<!-- ▼テスト中はnoindexを必ず設置。本番反映時にこの行を削除 -->
+<meta name="robots" content="noindex, nofollow">
+
+<!-- ▼正規URL(仮)。サブドメイン確定後、一括で本番URLに置換 -->
+<link rel="canonical" href="https://shogu-kaizen.pray-power-is-god-and-cocoro.com/">
+
+<!-- ▼favicon(ファイルは後日追加予定。設置コードのみ先行) -->
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- 背景シーン(固定・パララックス) -->
+<div id="bg-scene" aria-hidden="true">
+  <div class="parallax-sky">
+    <div class="sun-glow"></div>
+    <div class="cloud cloud-a"></div>
+    <div class="cloud cloud-b"></div>
+    <div class="cloud cloud-c"></div>
+    <div class="cloud cloud-d"></div>
+  </div>
+  <div class="parallax-ground">
+    <div class="ground"></div>
+    <div class="grain-row" id="grain-row"><!-- JSで稲穂を生成 --></div>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="brand">
+    処遇改善加算ナビ
+    <span>うちの場合、どうすればいい？をすぐ診断</span>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="tool-card">
+    <h1>処遇改善加算ナビ</h1>
+    <p class="lede">障害福祉サービスの処遇改善加算について、質問に答えるだけで「うちが目指せる区分」と「その理由」が分かります。行政資料を読み込む前に、まずはこちらでセルフチェックしてみてください。</p>
+
+    <div class="tab-nav" role="tablist">
+      <button class="tab-btn is-active" data-tab="wizard" role="tab" aria-selected="true">区分診断ウィザード</button>
+      <button class="tab-btn" data-tab="checklist" role="tab" aria-selected="false">提出書類チェックリスト</button>
+      <button class="tab-btn" data-tab="glossary" role="tab" aria-selected="false">「つまり」用語辞典</button>
+    </div>
+
+    <!-- ① 区分診断ウィザード -->
+    <div class="tab-panel is-active" id="panel-wizard">
+      <div id="wizard-root"><!-- script.jsが描画 --></div>
+    </div>
+
+    <!-- ② 提出書類チェックリスト(準備中) -->
+    <div class="tab-panel" id="panel-checklist">
+      <div class="coming-soon">
+        提出書類チェックリストは、現在準備中です🌾<br>
+        次回の更新で、制度・時期を選ぶだけで必要書類の一覧と進捗％が分かる機能を追加予定です。
+      </div>
+    </div>
+
+    <!-- ③ 「つまり」用語辞典(先行で数語のみ設置) -->
+    <div class="tab-panel" id="panel-glossary">
+      <div class="accordion-group">
+        <details class="glossary-item">
+          <summary>キャリアパス要件Ⅰとは</summary>
+          <p>正式には「任用要件・賃金体系の整備等」。つまり――役職や職務内容に応じて「誰がどう昇進していくか」「給与はどう決まるか」を、書面のルールとして決めて、全職員に周知しておくことです。就業規則や内規に明文化されていることが条件になります。</p>
+        </details>
+        <details class="glossary-item">
+          <summary>「誓約」とは</summary>
+          <p>つまり――「今はまだ要件を満たしていないけれど、年度内(令和8年3月末まで)に整備します」と計画書で約束することです。誓約すれば、令和7年度当初からその要件を満たしたものとして扱ってもらえます。ただし誓約できるのはキャリアパス要件Ⅰ〜Ⅲと職場環境等要件のみで、キャリアパス要件Ⅳ(440万円要件)やⅤ(配置等要件)には誓約の仕組みがない点に注意が必要です。</p>
+        </details>
+        <details class="glossary-item">
+          <summary>職場環境等要件とは</summary>
+          <p>つまり――「入職促進」「資質向上」「両立支援」「腰痛対策」「やりがい醸成」「生産性向上」といった区分ごとに、実際に取り組んでいることを一定数チェックする要件です。処遇改善加算ⅠとⅡはやや多めの数(各区分2つ以上など)、ⅢとⅣは少なめの数(各区分1つ以上など)が必要です。</p>
+        </details>
+      </div>
+      <p class="disclaimer-note">用語辞典は今後追加していく予定です🌾 個別の記事ページでも、より詳しく解説しています。</p>
+    </div>
+
+  </section>
+
+  <!-- SEO記事への導線 -->
+  <div class="article-flow">
+    <section class="glass-section">
+      <h2>処遇改善加算、もっと詳しく知りたい方へ</h2>
+      <div class="article-card-grid">
+        <a class="article-card" href="column-01.html">
+          <span class="cat">制度の基本</span><br>
+          処遇改善加算ⅠからⅣ、結局何が違うの？
+        </a>
+        <a class="article-card" href="column-02.html">
+          <span class="cat">令和7年度の実務</span><br>
+          「誓約」って結局何をすればいいの？
+        </a>
+      </div>
+      <p class="section-note">記事は順次追加予定です。各記事の末尾から、この診断ウィザードにすぐ戻れます。</p>
+    </section>
+  </div>
+
+  <p class="disclaimer-note" style="margin-top:24px;">
+    本サイトの診断結果は目安です。断定できない部分や自治体ごとに運用が異なりうる項目については、必ず指定権者(自治体)・国民健康保険団体連合会等にご確認ください。最終確認日：令和7年7月13日
+  </p>
+
+</main>
+
+<footer class="site-footer">
+  <p>© 処遇改善加算ナビ｜<a href="https://for-welfare.pray-power-is-god-and-cocoro.com/portal/">まごころ福祉総合ポータルへ戻る</a></p>
+</footer>
+
+<button id="page-top" aria-label="トップに戻る">↑</button>
+
+<script src="script.js"></script>
+</body>
+</html>
