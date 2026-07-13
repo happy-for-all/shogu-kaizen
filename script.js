@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
   initTabs();
   initBackToTop();
   initWizard();
+  initChecklist();
 });
 
 /* -----------------------------------------
@@ -92,6 +93,143 @@ function initBackToTop() {
   btn.addEventListener('click', function () {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
+}
+
+/* -----------------------------------------
+   提出書類チェックリスト（障害福祉版）
+   書類名の根拠：障障発0307第１号 こ支障第11号（令和7年3月7日）通知
+   別紙様式2-1・2-2・3-1・3-2・4・5 の記載に基づく。
+   利用者の入力（チェック状況）は、サーバーに送信せず、
+   ブラウザのlocalStorageにのみ保存する（個人情報保護方針）。
+   ----------------------------------------- */
+function initChecklist() {
+  const root = document.getElementById('checklist-root');
+  if (!root) return;
+
+  const DOC_SETS = {
+    new: {
+      label: '新規算定・区分変更時',
+      items: [
+        { id: 'y2-1', label: '処遇改善計画書（別紙様式２－１）', sub: '賃金改善の見込額や取組内容を記載する基本の計画書' },
+        { id: 'y2-2', label: '事業所一覧（別紙様式２－２）', sub: '複数事業所を一括して申請する場合の一覧表' },
+        { id: 'y3-2-new', label: 'キャリアパス要件Ⅳについて（別紙様式３－２）', sub: '該当する場合のみ。440万円要件を満たす職員数を記載' }
+      ]
+    },
+    annual: {
+      label: '毎年度の実績報告時',
+      items: [
+        { id: 'y3-1', label: '実績報告書（別紙様式３－１）', sub: '賃金改善の実績や各要件の充足状況を報告する書類' },
+        { id: 'y3-2-annual', label: 'キャリアパス要件Ⅳについて（別紙様式３－２）', sub: '440万円要件の該当者数を記載' },
+        { id: 'evidence', label: '給与明細・勤務記録等の根拠資料', sub: '指定権者からの求めに応じて速やかに提出できるよう、日頃から保管しておく（提出そのものは通常不要）' }
+      ]
+    },
+    change: {
+      label: '変更事項が生じた時',
+      items: [
+        { id: 'y4', label: '変更に係る届出書（別紙様式４）', sub: '区分変更・法人合併・就業規則改訂等があった場合に提出' },
+        { id: 'y5', label: '特別な事情に係る届出書（別紙様式５）', sub: '賃金水準を引き下げる必要がある場合のみ、追加で提出' }
+      ]
+    }
+  };
+
+  root.innerHTML =
+    '<div class="checklist-select-row">' +
+      '<div class="field">' +
+        '<label for="cl-system">制度</label>' +
+        '<select id="cl-system">' +
+          '<option value="shogai">障害福祉サービス</option>' +
+          '<option value="kaigo">介護保険サービス（準備中）</option>' +
+        '</select>' +
+      '</div>' +
+      '<div class="field">' +
+        '<label for="cl-timing">タイミング</label>' +
+        '<select id="cl-timing">' +
+          '<option value="new">新規算定・区分変更時</option>' +
+          '<option value="annual">毎年度の実績報告時</option>' +
+          '<option value="change">変更事項が生じた時</option>' +
+        '</select>' +
+      '</div>' +
+    '</div>' +
+    '<div id="cl-body"></div>';
+
+  const systemSel = document.getElementById('cl-system');
+  const timingSel = document.getElementById('cl-timing');
+  const body = document.getElementById('cl-body');
+
+  systemSel.addEventListener('change', renderList);
+  timingSel.addEventListener('change', renderList);
+  renderList();
+
+  function storageKey(itemId) {
+    return 'checklist:' + timingSel.value + ':' + itemId;
+  }
+
+  function getChecked(itemId) {
+    try {
+      return window.localStorage.getItem(storageKey(itemId)) === '1';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function setChecked(itemId, val) {
+    try {
+      window.localStorage.setItem(storageKey(itemId), val ? '1' : '0');
+    } catch (e) { /* 保存できない場合も画面表示自体は継続する */ }
+  }
+
+  function renderList() {
+    if (systemSel.value === 'kaigo') {
+      body.innerHTML = '<div class="coming-soon">介護保険サービスのチェックリストは、現在準備中です🌾</div>';
+      return;
+    }
+
+    const set = DOC_SETS[timingSel.value];
+    const listHtml = set.items.map(function (item) {
+      const checked = getChecked(item.id) ? 'checked' : '';
+      return (
+        '<div class="doc-item">' +
+          '<input type="checkbox" id="doc-' + item.id + '" ' + checked + '>' +
+          '<label for="doc-' + item.id + '">' + item.label +
+            '<span class="doc-sub">' + item.sub + '</span>' +
+          '</label>' +
+        '</div>'
+      );
+    }).join('');
+
+    body.innerHTML =
+      '<div class="progress-label" id="cl-progress-label"></div>' +
+      '<div class="progress-bar-wrap"><div class="progress-bar-fill" id="cl-progress-fill"></div></div>' +
+      '<div class="doc-list">' + listHtml + '</div>' +
+      '<div class="btn-row">' +
+        '<button class="btn btn-ghost" id="cl-print">印刷用に表示する</button>' +
+      '</div>' +
+      '<p class="disclaimer-note">書類名・要否は令和7年3月7日付通知に基づく目安です。実際の提出書類は指定権者の指示を優先してください。チェック状況はこの端末のブラウザにのみ保存され、送信されません。</p>';
+
+    set.items.forEach(function (item) {
+      const cb = document.getElementById('doc-' + item.id);
+      cb.addEventListener('change', function () {
+        setChecked(item.id, cb.checked);
+        updateProgress(set);
+      });
+    });
+
+    document.getElementById('cl-print').addEventListener('click', function () {
+      window.print();
+    });
+
+    updateProgress(set);
+  }
+
+  function updateProgress(set) {
+    const total = set.items.length;
+    const done = set.items.filter(function (item) { return getChecked(item.id); }).length;
+    const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+    const fill = document.getElementById('cl-progress-fill');
+    const label = document.getElementById('cl-progress-label');
+    if (fill) fill.style.width = pct + '%';
+    if (label) label.textContent = '完了率 ' + pct + '%（' + done + ' / ' + total + '）';
+  }
 }
 
 /* -----------------------------------------

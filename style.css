@@ -440,6 +440,68 @@ tr.row-warning { background: var(--warn-bg); }
   border-radius: var(--radius-md);
 }
 
+/* 広告枠（Googleアドセンス用）
+   文章用のカード状セクションのスタイルをそのまま当てると、
+   スマホで「広告よりも背景の箱の方が大きい」見た目になるため、
+   背景・影・余白を打ち消す専用クラスを用意する。 */
+.ad-section {
+  margin: 28px 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  text-align: center;
+  overflow: hidden;
+}
+.ad-section .ad-label {
+  font-size: 11px;
+  color: var(--text-sub);
+  margin-bottom: 6px;
+  letter-spacing: .05em;
+}
+
+/* 提出書類チェックリスト */
+.checklist-select-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.progress-bar-wrap {
+  background: rgba(169,118,42,0.12);
+  border-radius: 999px;
+  height: 14px;
+  overflow: hidden;
+  margin: 10px 0 4px;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(to right, var(--grain-main), var(--grain-dark));
+  transition: width .25s ease;
+}
+.progress-label {
+  font-size: 13px;
+  color: var(--text-sub);
+  font-weight: 700;
+  text-align: right;
+}
+.doc-list { display: flex; flex-direction: column; gap: 4px; margin-top: 16px; }
+.doc-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 4px;
+  border-bottom: 1px solid rgba(169,118,42,0.15);
+}
+.doc-item:last-child { border-bottom: none; }
+.doc-item input[type="checkbox"] {
+  margin-top: 3px;
+  width: 18px; height: 18px;
+  accent-color: var(--grain-main);
+  flex-shrink: 0;
+}
+.doc-item label { font-size: 14px; }
+.doc-item .doc-sub { display: block; font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+
 /* 準備中バッジ */
 .coming-soon {
   text-align: center;
@@ -667,7 +729,7 @@ footer.site-footer a { text-decoration: underline; }
    ----------------------------------------- */
 @media print {
   #bg-scene, header.site-header, .article-flow, footer.site-footer,
-  .btn-row, .disclaimer-note, form.tool-form, #page-top, .tab-nav { display: none !important; }
+  .btn-row, .disclaimer-note, form.tool-form, #page-top, .tab-nav, .ad-section { display: none !important; }
   body { background: #fff; }
   .tool-card { box-shadow: none; border: none; }
   .print-only { display: block !important; }
