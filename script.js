@@ -108,7 +108,7 @@ function initChecklist() {
   const root = document.getElementById('checklist-root');
   if (!root) return;
 
-  const DOC_SETS = {
+  const DOC_SETS_SHOGAI = {
     new: {
       label: '新規算定・区分変更時',
       items: [
@@ -135,13 +135,41 @@ function initChecklist() {
     }
   };
 
+  /* 介護保険版の提出書類（根拠：老発0313第６号）
+     ※障害福祉版と異なり、実績報告書は「３－１／３－２」に分かれておらず、
+     　別紙様式３（実績報告書）1本にまとまっている。 */
+  const DOC_SETS_KAIGO = {
+    new: {
+      label: '新規算定・区分変更時',
+      items: [
+        { id: 'ky2-1', label: '処遇改善計画書 総括表（別紙様式２－１）', sub: '賃金改善計画の全体像・各要件の充足状況をまとめる基本の様式' },
+        { id: 'ky2-2', label: '個票／令和8年4・5月分（別紙様式２－２）', sub: '令和8年4月・5月分を算定する場合のみ提出' },
+        { id: 'ky2-3', label: '個票／令和8年6月以降分（別紙様式２－３）', sub: '令和8年6月以降の算定分（新区分イ／ロ対応）はこちらを使用' }
+      ]
+    },
+    annual: {
+      label: '毎年度の実績報告時',
+      items: [
+        { id: 'ky3', label: '実績報告書（別紙様式３）', sub: '賃金改善の実績や各要件の充足状況を報告する書類' },
+        { id: 'kevidence', label: '給与明細・勤務記録等の根拠資料', sub: '指定権者からの求めに応じて速やかに提出できるよう、日頃から保管しておく（提出そのものは通常不要）' }
+      ]
+    },
+    change: {
+      label: '変更事項が生じた時',
+      items: [
+        { id: 'ky4', label: '変更に係る届出書（別紙様式４）', sub: 'キャリアパス要件Ⅴ（介護福祉士等の配置要件）の適合状況変更等があった場合に提出。別紙様式２－２・２－３のうち該当する個票もあわせて提出' },
+        { id: 'ky5', label: '特別な事情に係る届出書（別紙様式５）', sub: '賃金水準を引き下げる必要がある場合のみ、追加で提出' }
+      ]
+    }
+  };
+
   root.innerHTML =
     '<div class="checklist-select-row">' +
       '<div class="field">' +
         '<label for="cl-system">制度</label>' +
         '<select id="cl-system">' +
           '<option value="shogai">障害福祉サービス</option>' +
-          '<option value="kaigo">介護保険サービス（準備中）</option>' +
+          '<option value="kaigo">介護保険サービス</option>' +
         '</select>' +
       '</div>' +
       '<div class="field">' +
@@ -164,7 +192,7 @@ function initChecklist() {
   renderList();
 
   function storageKey(itemId) {
-    return 'checklist:' + timingSel.value + ':' + itemId;
+    return 'checklist:' + systemSel.value + ':' + timingSel.value + ':' + itemId;
   }
 
   function getChecked(itemId) {
@@ -182,12 +210,8 @@ function initChecklist() {
   }
 
   function renderList() {
-    if (systemSel.value === 'kaigo') {
-      body.innerHTML = '<div class="coming-soon">介護保険サービスのチェックリストは、現在準備中です🌾</div>';
-      return;
-    }
-
-    const set = DOC_SETS[timingSel.value];
+    const docSets = systemSel.value === 'kaigo' ? DOC_SETS_KAIGO : DOC_SETS_SHOGAI;
+    const set = docSets[timingSel.value];
     const listHtml = set.items.map(function (item) {
       const checked = getChecked(item.id) ? 'checked' : '';
       return (
@@ -207,7 +231,7 @@ function initChecklist() {
       '<div class="btn-row">' +
         '<button class="btn btn-ghost" id="cl-print">印刷用に表示する</button>' +
       '</div>' +
-      '<p class="disclaimer-note">書類名・要否は令和8年3月31日付通知（令和8年度分）に基づく目安です。実際の提出書類は指定権者の指示を優先してください。チェック状況はこの端末のブラウザにのみ保存され、送信されません。</p>';
+      '<p class="disclaimer-note">書類名・要否は、' + (systemSel.value === 'kaigo' ? '令和8年3月13日付 老発0313第６号通知' : '令和8年3月31日付 障障発0331第１号通知') + '（令和8年度分）に基づく目安です。実際の提出書類は指定権者の指示を優先してください。チェック状況はこの端末のブラウザにのみ保存され、送信されません。</p>';
 
     set.items.forEach(function (item) {
       const cb = document.getElementById('doc-' + item.id);
@@ -269,32 +293,16 @@ function initWizard() {
         choices: [
           { label: '従来からのサービス', sub: '居宅介護・生活介護・就労継続支援A型/B型・グループホーム 等（別紙１表１－２対象）', value: 'std' },
           { label: '相談支援系サービス', sub: '計画相談支援・地域相談支援・障害児相談支援（令和8年6月に新設）', value: 'consult' },
-          { label: '介護保険サービス', sub: '準備中の制度です', value: 'kaigo' }
+          { label: '介護保険サービス', sub: '訪問介護・通所介護・特養・グループホーム 等（老発0313第６号対象）', value: 'kaigo' }
         ],
         onSelect: function (v) {
           state.service = v;
-          if (v === 'kaigo') state.step = 'kaigo-soon';
+          if (v === 'kaigo') state.step = 'kaigo-tokurei';
           else if (v === 'consult') state.step = 'c-tokurei';
           else state.step = 'tokurei';
           render();
         }
       }));
-      return;
-    }
-
-    if (state.step === 'kaigo-soon') {
-      const box = document.createElement('div');
-      box.className = 'wizard-result';
-      box.innerHTML =
-        '<p class="result-reason">介護保険サービスの診断ロジックは、現在準備中です🌾<br>' +
-        '介護保険の処遇改善加算は要件構造が障害福祉と異なるため、根拠資料をもとに別途整備してから追加いたします。今しばらくお待ちください。</p>';
-      const backBtn = document.createElement('button');
-      backBtn.className = 'btn btn-ghost';
-      backBtn.style.marginTop = '14px';
-      backBtn.textContent = '← はじめからやり直す';
-      backBtn.addEventListener('click', function () { resetWizard(); });
-      box.appendChild(backBtn);
-      root.appendChild(box);
       return;
     }
 
@@ -384,6 +392,108 @@ function initWizard() {
 
     if (state.step === 'result') {
       root.appendChild(buildResult());
+      return;
+    }
+
+    /* ---------- 介護保険サービスの質問フロー ---------- */
+    /* 根拠：老発0313第６号（令和8年3月13日、厚生労働省老健局長通知）
+       「介護職員等処遇改善加算に関する基本的考え方並びに事務処理手順及び
+       様式例の提示について」（令和8年度分）別紙１ 表２－１・表２－２・表４
+       ※障害福祉版と要件構造が似ているが、以下の点が異なるため個別に実装する。
+         ・キャリアパス要件Ⅳの賃金要件は440万円（障害福祉版は460万円）
+         ・職場環境等要件に「全体◯以上」という合計基準はなく、各区分の
+           最低数のみで判定する
+         ・生産性向上の必須項目は「⑰又は⑱」（障害福祉版は⑱のみ）
+         ・キャリアパス要件Ⅳ・職場環境等要件の誓約も、⑧令和8年度特例要件を
+           満たす事業所に限られる（障害福祉版のキャリアパス要件Ⅳは無条件で誓約可）
+         ・キャリアパス要件Ⅳを職場環境等要件で代替するルールは存在しない
+         ・キャリアパス要件Ⅴは「配置等要件の届出」ではなく「介護福祉士等の
+           配置要件」で、対象外（免除）サービスは存在しない */
+
+    if (state.step === 'kaigo-tokurei') {
+      root.appendChild(buildChoiceStep({
+        progress: '質問 1 / 7',
+        question: '⑧令和8年度特例要件（Ⅰロ・Ⅱロを目指す場合の追加要件）の状況は？',
+        note: '「ケアプランデータ連携システムの利用」「生産性向上推進体制加算Ⅰ又はⅡの算定」「社会福祉連携推進法人への所属」のいずれか1つを満たすことが必要です（前二者は令和9年3月末までの誓約も可能です）。Ⅰロ・Ⅱロを目指さない場合は「目指さない」を選んでください。',
+        choices: [
+          { label: '満たす（上記いずれかに該当）', value: 'ok' },
+          { label: '令和9年3月末までに整備することを誓約する', value: 'pledge' },
+          { label: 'Ⅰロ・Ⅱロは目指さない（わからない場合も選択）', value: 'no' }
+        ],
+        onSelect: function (v) { state.tokurei = v; state.step = 'kaigo-cp1'; render(); }
+      }));
+      return;
+    }
+
+    if (state.step === 'kaigo-cp1') {
+      root.appendChild(buildCareerPathStep('cp1', 2, 'キャリアパス要件Ⅰ（任用要件・賃金体系の整備等）',
+        '職位・職責・職務内容に応じた任用の要件や賃金体系を定め、就業規則等の書面で全介護職員に周知している状態です。',
+        function (v) { state.cp1 = v; state.step = 'kaigo-cp2'; render(); }));
+      return;
+    }
+
+    if (state.step === 'kaigo-cp2') {
+      root.appendChild(buildCareerPathStep('cp2', 3, 'キャリアパス要件Ⅱ（研修の実施等）',
+        '資質向上の目標・計画を策定し、研修の実施または研修機会の確保を行い、全介護職員に周知している状態です。',
+        function (v) { state.cp2 = v; state.step = 'kaigo-cp3'; render(); }));
+      return;
+    }
+
+    if (state.step === 'kaigo-cp3') {
+      root.appendChild(buildCareerPathStep('cp3', 4, 'キャリアパス要件Ⅲ（昇給の仕組みの整備等）',
+        '経験・資格等に応じて昇給する仕組み、または一定基準に基づき定期に昇給を判定する仕組みを設けている状態です。',
+        function (v) { state.cp3 = v; state.step = 'kaigo-cp4'; render(); }));
+      return;
+    }
+
+    if (state.step === 'kaigo-cp4') {
+      root.appendChild(buildChoiceStep({
+        progress: '質問 5 / 7',
+        question: 'キャリアパス要件Ⅳ（改善後の賃金要件）は満たせそうですか？',
+        note: '事業所内に、改善後の賃金が年額440万円以上となる介護職員が1人以上いる状態です。令和8年度は、⑧令和8年度特例要件を満たす事業所に限り、誓約による猶予が使えます（障害福祉版と異なり、この要件を職場環境等要件で代替するルールはありません）。',
+        choices: [
+          { label: '満たす（該当者が1人以上いる、または今後配置できる）', value: 'ok' },
+          { label: '令和9年3月末までに整備することを誓約する', value: 'pledge' },
+          { label: '満たさない', value: 'no' }
+        ],
+        onSelect: function (v) { state.cp4 = v; state.step = 'kaigo-cp5'; render(); }
+      }));
+      return;
+    }
+
+    if (state.step === 'kaigo-cp5') {
+      root.appendChild(buildChoiceStep({
+        progress: '質問 6 / 7',
+        question: 'キャリアパス要件Ⅴ（介護福祉士等の配置要件）はいかがですか？',
+        note: 'サービス類型ごとに定められた加算（サービス提供体制強化加算、特定事業所加算、入居継続支援加算、日常生活継続支援加算 等）の届出状況を指します。必要な加算の種類はサービスごとに異なるため、詳しくは通知別紙１ 表３でご確認ください（障害福祉版と異なり、この要件が不要となる対象外サービスはありません）。',
+        choices: [
+          { label: '該当する加算の届出をしている', value: 'ok' },
+          { label: '届出をしていない・わからない', value: 'no' }
+        ],
+        onSelect: function (v) { state.cp5 = v; state.step = 'kaigo-env'; render(); }
+      }));
+      return;
+    }
+
+    if (state.step === 'kaigo-env') {
+      root.appendChild(buildChoiceStep({
+        progress: '質問 7 / 7',
+        question: '職場環境等要件（入職促進・資質向上・両立支援・腰痛対策・やりがい醸成・生産性向上）の取組状況は？',
+        note: '介護保険版には「全体で◯以上」という合計基準はなく、区分ごとの最低数のみで判定します。生産性向上推進体制加算を算定している場合はこの区分の要件を満たしたものとみなされ、1法人1施設のみの小規模事業者は㉔の取組のみで生産性向上の区分を満たしたものとみなされます。',
+        choices: [
+          { label: '各区分2以上・生産性向上3以上（⑰又は⑱は必須）を実施している', sub: '処遇改善加算Ⅰ・Ⅱ、Ⅰイ・Ⅰロ・Ⅱイ・Ⅱロの基準を満たす水準', value: 'high' },
+          { label: '各区分1以上・生産性向上2以上を実施している', sub: '処遇改善加算Ⅲ・Ⅳの基準を満たす水準', value: 'low' },
+          { label: 'Ⅲ・Ⅳの水準まで、令和9年3月末までに整備することを誓約する', sub: '⑧令和8年度特例要件を満たす場合のみ有効です', value: 'pledgeLow' },
+          { label: 'Ⅰ・Ⅱの水準まで、令和9年3月末までに整備することを誓約する', sub: '⑧令和8年度特例要件を満たす場合のみ有効です', value: 'pledgeHigh' },
+          { label: 'いずれにも該当しない', value: 'no' }
+        ],
+        onSelect: function (v) { state.env = v; state.step = 'kaigo-result'; render(); }
+      }));
+      return;
+    }
+
+    if (state.step === 'kaigo-result') {
+      root.appendChild(buildKaigoResult());
       return;
     }
 
@@ -601,6 +711,93 @@ function initWizard() {
     return wrap;
   }
 
+  function buildKaigoResult() {
+    const wrap = document.createElement('div');
+    wrap.className = 'wizard-step is-active';
+
+    const tokureiOk = state.tokurei === 'ok' || state.tokurei === 'pledge';
+    const cp1Ok = state.cp1 === 'ok' || (state.cp1 === 'pledge' && tokureiOk);
+    const cp2Ok = state.cp2 === 'ok' || (state.cp2 === 'pledge' && tokureiOk);
+    const cp3Ok = state.cp3 === 'ok' || (state.cp3 === 'pledge' && tokureiOk);
+    // 介護保険版：キャリアパス要件Ⅳの誓約も、⑧令和8年度特例要件を満たす場合のみ有効（障害福祉版と異なる）
+    const cp4Ok = state.cp4 === 'ok' || (state.cp4 === 'pledge' && tokureiOk);
+    // 介護保険版：キャリアパス要件Ⅴに「対象外（免除）」の区分は存在しない
+    const cp5Ok = state.cp5 === 'ok';
+
+    // 介護保険版：職場環境等要件の誓約は、低い水準（Ⅲ・Ⅳ）・高い水準（Ⅰ・Ⅱ）のいずれも
+    // ⑧令和8年度特例要件を満たす事業所に限られる（障害福祉版と異なる）
+    const envLowOk = ['high', 'low'].indexOf(state.env) !== -1 ||
+      (state.env === 'pledgeLow' && tokureiOk) ||
+      (state.env === 'pledgeHigh' && tokureiOk);
+    const envHighOk = state.env === 'high' || (state.env === 'pledgeHigh' && tokureiOk);
+
+    // Ⅳの土台：キャリアパスⅠ・Ⅱ＋職場環境等要件(Ⅲ・Ⅳ水準)
+    const okIV = cp1Ok && cp2Ok && envLowOk;
+    // Ⅲ：Ⅳの土台＋キャリアパスⅢ
+    const okIII = okIV && cp3Ok;
+    // Ⅱイ：Ⅲの土台＋キャリアパスⅣ(440万円)＋職場環境等要件(Ⅰ・Ⅱ水準)
+    // ※介護保険版には、職場環境等要件によるキャリアパス要件Ⅳの代替ルールはない
+    const okIIi = okIII && cp4Ok && envHighOk;
+    // Ⅱロ：Ⅱイの土台＋⑧令和8年度特例要件
+    const okIIro = okIIi && tokureiOk;
+    // Ⅰイ：Ⅱイの土台＋キャリアパスⅤ(介護福祉士等の配置要件)
+    const okIi = okIIi && cp5Ok;
+    // Ⅰロ：Ⅰイの土台＋⑧令和8年度特例要件
+    const okIro = okIi && tokureiOk;
+
+    let grade = null;
+    if (okIro) grade = 'Ⅰロ';
+    else if (okIi) grade = 'Ⅰイ';
+    else if (okIIro) grade = 'Ⅱロ';
+    else if (okIIi) grade = 'Ⅱイ';
+    else if (okIII) grade = 'Ⅲ';
+    else if (okIV) grade = 'Ⅳ';
+
+    const missing = [];
+    if (!cp1Ok) missing.push('キャリアパス要件Ⅰ（任用要件・賃金体系の整備等）');
+    if (!cp2Ok) missing.push('キャリアパス要件Ⅱ（研修の実施等）');
+    if (!envLowOk) missing.push('職場環境等要件（Ⅲ・Ⅳ水準）');
+
+    const box = document.createElement('div');
+    box.className = 'wizard-result';
+
+    if (grade) {
+      box.innerHTML = '<div class="result-grade">目安：介護職員等処遇改善加算 ' + grade + '</div>';
+    } else {
+      box.innerHTML = '<div class="result-grade" style="font-size:18px;">現時点では介護職員等処遇改善加算Ⅳの要件充足が難しい状況です</div>';
+    }
+
+    const reasonList = document.createElement('ul');
+    reasonList.className = 'reason-list';
+
+    if (grade) {
+      reasonList.innerHTML =
+        '<li>⑧令和8年度特例要件：' + labelPledgeSimple(state.tokurei) + '</li>' +
+        '<li>キャリアパス要件Ⅰ・Ⅱ：' + labelCp(state.cp1, tokureiOk) + ' / ' + labelCp(state.cp2, tokureiOk) + '</li>' +
+        '<li>キャリアパス要件Ⅲ：' + labelCp(state.cp3, tokureiOk) + '</li>' +
+        '<li>キャリアパス要件Ⅳ（440万円要件）：' + labelCp(state.cp4, tokureiOk) + '</li>' +
+        '<li>キャリアパス要件Ⅴ（介護福祉士等の配置要件）：' + (cp5Ok ? '満たす' : '満たさない・要確認') + '</li>' +
+        '<li>職場環境等要件：' + labelKaigoEnv(state.env) + '</li>';
+    } else {
+      reasonList.innerHTML = missing.map(function (m) { return '<li>' + m + '</li>'; }).join('');
+    }
+    box.appendChild(reasonList);
+
+    const noteP = document.createElement('p');
+    noteP.className = 'disclaimer-note';
+    noteP.style.marginTop = '14px';
+    noteP.innerHTML =
+      'この結果は、令和8年3月13日付 老発0313第６号通知（令和8年度分）の要件構造に基づく目安です。' +
+      'なお、どの区分を目指す場合でも、月額賃金改善要件（処遇改善加算Ⅳ相当額の2分の1以上を基本給等の改善に充てること）は、区分にかかわらず必ず実施する必要があります。' +
+      '誓約の有効性やキャリアパス要件Ⅴ（介護福祉士等の配置要件）に必要な加算の種類は、サービス類型や事業所の状況によって異なりますので、' +
+      '最終的な区分の決定・届出前に必ず指定権者にご確認ください。';
+    box.appendChild(noteP);
+
+    box.appendChild(buildRestartRow());
+    wrap.appendChild(box);
+    return wrap;
+  }
+
   function buildConsultResult() {
     const wrap = document.createElement('div');
     wrap.className = 'wizard-step is-active';
@@ -670,6 +867,13 @@ function initWizard() {
     if (v === 'low') return '全体8以上（Ⅲ・Ⅳ水準）を満たす';
     if (v === 'pledgeLow') return '全体8以上まで誓約';
     if (v === 'pledgeHigh') return '全体14以上まで誓約（⑧特例要件が前提）';
+    return '未整備';
+  }
+  function labelKaigoEnv(v) {
+    if (v === 'high') return 'Ⅰ・Ⅱ水準（各区分2以上・生産性向上3以上）を満たす';
+    if (v === 'low') return 'Ⅲ・Ⅳ水準（各区分1以上・生産性向上2以上）を満たす';
+    if (v === 'pledgeLow') return 'Ⅲ・Ⅳ水準まで誓約（⑧特例要件が前提）';
+    if (v === 'pledgeHigh') return 'Ⅰ・Ⅱ水準まで誓約（⑧特例要件が前提）';
     return '未整備';
   }
 
