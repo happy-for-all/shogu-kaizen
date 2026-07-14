@@ -234,7 +234,7 @@ input, select { font-family: inherit; }
   z-index: 1;
   max-width: 880px;
   margin: 0 auto;
-  padding: 0 20px 80px;
+  padding: 0 20px 50px;
 }
 
 header.site-header {
